@@ -2,6 +2,8 @@
 
 A Codex Skill for long-session context budgeting, command output protection, living handoff, truncation recovery, and repo workflow governance.
 
+This is a single-skill repo for the `codex-long-session-governance` Codex Skill.
+
 ## When To Use
 
 Use this Skill for:
