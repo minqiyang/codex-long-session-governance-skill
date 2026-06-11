@@ -48,6 +48,15 @@ Example prompt:
 请使用 $codex-long-session-governance。先检查 repo state，限制未知命令输出，避免读取 secrets/config.toml/raw data，按最小上下文推进一个 PR-sized stage。
 ```
 
+## Reducing Oversized `/goal` Prompts
+
+- Put stable rules in `AGENTS.md` or this Skill.
+- Put current state in `docs/current_handoff.md` or `HANDOFF.md`.
+- Put full stage details in `docs/STAGE_PLAN.md` or an equivalent stage plan.
+- Put stop gates and context budget rules in controller docs.
+- Keep `/goal` as a compact launch index that points to those sources.
+- Run `.\audit.ps1` before committing changes.
+
 ## Safety
 
 - No secrets should be stored in this repo.

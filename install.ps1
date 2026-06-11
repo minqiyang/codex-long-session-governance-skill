@@ -16,7 +16,12 @@ function Get-RelativePath {
         [Parameter(Mandatory=$true)][string]$FullPath
     )
 
-    return [System.IO.Path]::GetRelativePath($BasePath, $FullPath)
+    $normalizedBase = $BasePath.TrimEnd('\') + '\'
+    if ($FullPath.StartsWith($normalizedBase, [System.StringComparison]::OrdinalIgnoreCase)) {
+        return $FullPath.Substring($normalizedBase.Length)
+    }
+
+    return $FullPath
 }
 
 $forbiddenFiles = foreach ($pattern in $ForbiddenNamePatterns) {

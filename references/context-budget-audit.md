@@ -14,5 +14,15 @@ Use this lightweight checklist to audit a long-session governance run or the Ski
 - Repo workflow governance stop conditions exist.
 - Truncation recovery exists.
 - Final output rules are concise.
+- `/goal` stays short and index-like.
+- Detailed specs are placed in `STAGE_PLAN` or equivalent.
+- Current state is placed in handoff rather than repeated in the prompt.
+- Permanent rules are placed in `AGENTS.md` or a Skill rather than repeated every turn.
+- Logs are treated as historical and not first-pass context.
+- A do-not-reread list exists when the session is long or repeated.
+- Optional expansions are kept out of the current checkpoint.
+- Stop gates are preserved after compression.
+- Validation commands are preserved after compression.
+- Prompt compression removes explanation and repetition, not requirements.
 - No secrets, `.env` content, credentials, tokens, SSH keys, API keys, or `config.toml` content are read or modified.
 - No permanent helper files are created unless the repo scope explicitly allows them.

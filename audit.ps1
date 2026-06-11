@@ -15,7 +15,12 @@ function Get-RelativePath {
         [Parameter(Mandatory=$true)][string]$FullPath
     )
 
-    return [System.IO.Path]::GetRelativePath($BasePath, $FullPath)
+    $normalizedBase = $BasePath.TrimEnd('\') + '\'
+    if ($FullPath.StartsWith($normalizedBase, [System.StringComparison]::OrdinalIgnoreCase)) {
+        return $FullPath.Substring($normalizedBase.Length)
+    }
+
+    return $FullPath
 }
 
 if (-not (Test-Path -LiteralPath $SkillPath)) {
@@ -46,7 +51,10 @@ if (-not (Test-Path -LiteralPath $SkillPath)) {
                 'repo workflow governance',
                 'PR gate',
                 'truncation recovery',
-                'token budget'
+                'token budget',
+                'oversized /goal',
+                'prompt compression',
+                'instruction placement'
             )
 
             foreach ($term in $requiredDescriptionTerms) {

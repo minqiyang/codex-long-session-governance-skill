@@ -1,6 +1,6 @@
 ---
 name: codex-long-session-governance
-description: Codex long session, context budget, byte cap, command output protection, needle map, pre-compact raw data, living handoff, retrieval policy, repo workflow governance, PR gate, truncation recovery, large logs, large repo, stale memory, hallucination risk, token budget. Use to govern evidence retrieval, output limits, handoff, and PR-stage control in long Codex repo/log/data sessions. Do not use for simple one-off tasks, tiny single-file edits, or tasks with no large repo/log/context/token risk.
+description: Codex long session, context budget, byte cap, command output protection, needle map, pre-compact raw data, living handoff, retrieval policy, repo workflow governance, PR gate, truncation recovery, large logs, large repo, stale memory, hallucination risk, token budget, oversized /goal, prompt compression, instruction placement. Use to govern evidence retrieval, output limits, handoff, and PR-stage control in long Codex repo/log/data sessions. Do not use for simple one-off tasks, tiny single-file edits, or tasks with no large repo/log/context/token risk.
 ---
 
 # Codex Long Session Governance
@@ -22,6 +22,7 @@ Use this Skill when any of the following apply:
 - Codex has shown or may show stale memory, hallucination, context truncation, repeated broad reads, excessive token use, or workflow drift;
 - the next action must be derived from repo evidence rather than chat memory;
 - the user asks to reduce token burn, manage context, avoid truncation, or create a durable handoff.
+- the user asks to shorten an oversized `/goal` or split detailed instructions into repo docs, handoff, controller docs, or task-specific Skills.
 
 ## When not to use
 
@@ -37,6 +38,8 @@ Do not use this Skill for:
 
 The session stays evidence-first, bounded, and resumable. Codex should choose the next action from current repo evidence, cap unknown output, pre-compact raw data and logs, update or propose a living handoff when needed, advance one PR-sized stage at a time, and stop at gates instead of drifting.
 
+For long `/goal` sessions, the launch prompt should stay short and index-like. Detailed requirements should live in the right repo document or Skill, with `/goal` pointing to those sources instead of repeating them.
+
 ## Success criteria
 
 - Current repo state is checked before implementation.
@@ -45,6 +48,8 @@ The session stays evidence-first, bounded, and resumable. Codex should choose th
 - Long files are searched or sampled before any full read.
 - Raw data and generated reports are pre-compacted into a needle map before analysis.
 - Handoff state is updated or proposed before context becomes stale or oversized.
+- Oversized `/goal` prompts are compressed into an index-style controller without dropping hard requirements.
+- Detailed stage specs, current state, permanent rules, and historical logs are placed in the right document type.
 - Repo work advances one small PR-sized stage at a time.
 - PR gates, dirty worktrees, truncation, destructive operations, and high-risk ambiguity stop the workflow.
 - Final reports are concise and do not paste full logs, full generated reports, or raw data.
@@ -74,8 +79,86 @@ Use these invariants:
 - Stop at merge gates.
 - Never merge PRs.
 - Do not rely on truncated output.
+- Keep `/goal` short; place durable instructions in the right source of truth.
 - Update handoff before context becomes stale or oversized.
 - Do not create permanent helper files unless the repo scope allows it.
+
+## Prompt Compression And Instruction Placement Policy
+
+Long `/goal` should not be a full specification. Treat `/goal` as an index-style controller containing only the goal, current context, scope, constraints, done-when criteria, validation, stop gates, and final report format.
+
+When practical, target about 2,000-3,500 characters for `/goal`. If the prompt is approaching 4,000 characters, split instructions into repo docs and make `/goal` reference them.
+
+Detailed specs should move into repo docs when allowed. Do not paste complete stage specs into `/goal` if they can live in `docs/STAGE_PLAN.md`, `docs/current_handoff.md`, a controller doc, or a task-specific Skill.
+
+Never silently drop hard requirements during compression. Move them to the correct document or mark them as omitted or unknown.
+
+### Instruction Placement Matrix
+
+| Location | Belongs there | Keep it concise by |
+| --- | --- | --- |
+| Global `AGENTS.md` | Permanent cross-project behavior rules, Skill-first routing, broad-read avoidance, secret safety, small PR preference | Keeping only stable rules |
+| Project `AGENTS.md` | Repo-specific permanent discipline, test commands, safety rules, repo conventions | Avoiding active-stage details |
+| `docs/current_handoff.md` or `HANDOFF.md` | Current state, branch or PR state, last completed checkpoint, known blockers, next action, do-not-reread list | Keeping it actionable and current |
+| `docs/STAGE_PLAN.md` or equivalent | Full stage or task specification, deliverables, detailed requirements, optional items, acceptance criteria | Removing state already in handoff |
+| Controller doc | Stop conditions, PR gates, context budget, logging rules, long-running workflow discipline | Keeping reusable workflow rules only |
+| Logs | Historical record only, such as engineering, decision, or troubleshooting history | Reading by targeted search or tail, not first-pass |
+| Task-specific Skill | Reusable workflow rules for one class of tasks | Excluding one-off stage details unless generalized |
+| `/goal` | Short launch index: what to do now, docs to read first, scope, validation, stop gates, final report format | Referencing docs instead of restating them |
+
+### How to shorten an oversized `/goal`
+
+Keep in `/goal`:
+
+- task objective;
+- current known state, limited to 1-3 lines;
+- first-pass docs to read;
+- scope and deliverables;
+- hard safety boundaries;
+- validation commands;
+- stop gates;
+- final report format.
+
+Move to `STAGE_PLAN.md`:
+
+- detailed class, function, or file-level notes;
+- long rationale;
+- detailed optional extensions;
+- extensive examples;
+- full acceptance criteria;
+- edge-case matrices.
+
+Move to `current_handoff.md`:
+
+- latest branch, commit, or PR state;
+- what was completed;
+- current blocker;
+- next recommended action;
+- do-not-reread list.
+
+Move to a controller doc:
+
+- general stop conditions;
+- context ladder;
+- output caps;
+- logging discipline;
+- PR gate behavior.
+
+Delete from `/goal`:
+
+- repeated explanations;
+- motivational text;
+- duplicated safety rules;
+- optional features that expand scope;
+- long background paragraphs;
+- stale context;
+- project-specific narrative not needed to execute the checkpoint.
+
+### Stage Plan Split Policy
+
+When a task prompt is too large, first create or update a detailed stage plan doc if repo rules and user scope allow doc changes. Then replace the long `/goal` with a compact reference to that doc.
+
+If modifying repo docs is not allowed, ask the user to store the detailed spec externally or provide a shortened task index. Preserve hard requirements by moving them, not deleting them.
 
 ## Context Budget And Retrieval Policy
 
@@ -240,22 +323,39 @@ Handoff target size:
 
 - under about 1,000 tokens;
 - preferably under 150 lines;
+- compact and actionable;
 - no raw logs;
 - no full command output;
-- no dead ends unless they prevent repeated mistakes.
+- no dead ends unless they prevent repeated mistakes;
+- no speculation preserved as fact;
+- not a second engineering log.
 
 Handoff must include:
 
 - current goal;
 - branch and PR gate state;
+- last completed checkpoint;
 - key files;
-- decisions made;
 - checks run and outcomes;
-- known issues;
+- known blockers;
 - do-not-reread list;
 - next recommended action.
 
 End long stages with: Compact current findings into the handoff. Strip repetitions and failed paths. Keep only actionable facts needed to continue.
+
+### Do-Not-Reread Policy
+
+Handoff may include a `Do not reread unless needed` section listing:
+
+- long logs;
+- generated reports;
+- archived outputs;
+- prior failed paths;
+- raw data files;
+- dependency directories;
+- files already summarized in repo maps or handoffs.
+
+Respect this list unless the active task directly requires targeted retrieval. If retrieval is needed, search or sample narrowly and update the handoff only with verified facts.
 
 ## Periodic Compaction Rule
 
@@ -401,6 +501,8 @@ Start from repo evidence, not chat memory. Use the context ladder, cap unknown o
 ## Known pitfalls
 
 - Treating stale chat memory as current repo state.
+- Letting `/goal` become a full stage specification instead of a compact launch index.
+- Dropping hard requirements during prompt compression instead of moving them to a stage plan or handoff.
 - Reading multiple long reports or logs in parallel.
 - Increasing output caps instead of narrowing the query.
 - Pasting full generated reports into final answers.
@@ -426,6 +528,9 @@ Before finishing a governed long-session task, check:
 
 - only allowed paths changed;
 - no secrets, `.env` content, tokens, credentials, SSH keys, API keys, `config.toml`, or forbidden config files were read or modified;
+- compressed `/goal` prompts preserve objective, scope, validation, stop gates, and hard safety boundaries;
+- detailed specs, current state, and permanent rules are placed in the appropriate docs or Skills;
+- no specific project details were added to this global Skill unless generalized;
 - unknown command output was capped;
 - long files were targeted, sampled, or explicitly justified before full read;
 - raw data was summarized through a needle map before analysis;
