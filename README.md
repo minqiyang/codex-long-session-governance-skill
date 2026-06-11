@@ -16,30 +16,8 @@ This is a single-skill repo for the `codex-long-session-governance` Codex Skill.
 
 Long Codex sessions can become expensive and unreliable when prompts, logs, reports, raw data, and tool outputs grow too large. Common failure modes include stale memory, broad rereads, context truncation, hallucinated repo state, and oversized `/goal` prompts that try to carry an entire stage specification.
 
-## What This Skill Does
 
-- Uses a context ladder before broad reads.
-- Byte-caps unknown command output.
-- Pre-compacts raw data, logs, and reports into needle maps before analysis.
-- Maintains a compact living handoff.
-- Uses a do-not-reread list for long or repeated sessions.
-- Compresses oversized `/goal` prompts into short launch indexes.
-- Places instructions in the right source: `AGENTS.md`, handoff, stage plan, controller doc, logs, or task-specific Skill.
-- Enforces PR and merge gate discipline.
-- Provides truncation recovery rules.
-
-## What This Skill Does Not Do
-
-- It does not execute trades.
-- It does not fetch private data.
-- It does not read secrets.
-- It does not replace project-specific `AGENTS.md`.
-- It does not make Codex automatically correct; it gives Codex a safer workflow.
-- It is not needed for tiny one-off edits.
-
-## Who Should Use This
-
-Use this Skill for:
+## Use for:
 
 - long Codex sessions;
 - large or unfamiliar repos;
@@ -47,15 +25,6 @@ Use this Skill for:
 - repeated staged PR workflows;
 - teams trying to reduce repeated prompt and context overhead;
 - users who want reusable repo workflow governance.
-
-## Who Should Not Use This
-
-Skip this Skill for:
-
-- one-off small questions;
-- tiny single-file edits;
-- non-repo creative writing;
-- tasks with no context budget or repo workflow risk.
 
 ## Quick Install
 
@@ -161,12 +130,6 @@ The detailed specification belongs in `docs/STAGE_PLAN.md` or an equivalent stag
 - Prefer summaries over full logs.
 - Do not read multiple long logs in parallel.
 - Treat logs as historical records, not first-pass context.
-
-## FAQ
-
-### Is this a Codex plugin?
-
-No. This is a Codex Skill repo. It provides a reusable `SKILL.md`, not a plugin runtime.
 
 ### Where does it install?
 
