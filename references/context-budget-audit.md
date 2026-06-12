@@ -11,6 +11,8 @@ Use this lightweight checklist to audit a long-session governance run or the Ski
 - Living handoff rule exists.
 - Periodic compaction rule exists.
 - PR gate rule exists.
+- Does a not-verified-merged PR gate pause after one current-state check rather
+  than repeated polling or reclassification?
 - Repo workflow governance stop conditions exist.
 - Truncation recovery exists.
 - Final output rules are concise.
@@ -29,5 +31,7 @@ Use this lightweight checklist to audit a long-session governance run or the Ski
 - Does it require verifiable branch protection/checks/reviews?
 - Does it stop when risk is medium/high/unclear?
 - Does final report include risk classification and auto-merge status?
+- Does the workflow avoid rerunning checks, protection queries, review queries,
+  or baseline validation while a previous PR is not verified merged?
 - No secrets, `.env` content, credentials, tokens, SSH keys, API keys, or `config.toml` content are read or modified.
 - No permanent helper files are created unless the repo scope explicitly allows them.

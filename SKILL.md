@@ -77,6 +77,9 @@ Use these invariants:
 - Summarize; do not paste.
 - One PR-sized stage at a time.
 - Stop at merge gates.
+- If a PR gate is not verified merged, report it once and pause; do not
+  repeatedly re-check, re-poll, or continue startup validation in the same
+  continuation unless the user explicitly asks for PR inspection.
 - Never merge PRs.
 - Do not rely on truncated output.
 - Keep `/goal` short; place durable instructions in the right source of truth.
@@ -419,7 +422,10 @@ Before implementation:
 - check branch;
 - check dirty worktree;
 - check remotes;
-- check open PR gate if tooling is available;
+- check the open PR gate once if tooling is available;
+- if a PR gate is not verified merged, stop after a concise gate report and do
+  not re-run checks, protection queries, review queries, or baseline validation
+  in that continuation;
 - read Level 1 context only;
 - choose one small PR-sized stage;
 - state assumptions only if needed.
@@ -435,7 +441,8 @@ During implementation:
 Stop conditions:
 
 - dirty worktree before new stage;
-- open PR gate not verified merged;
+- PR gate not verified merged, including open, closed-unmerged, unknown, or
+  otherwise unproven merge state;
 - high/medium risk ambiguity;
 - failing checks not safely fixable within scope;
 - need for credentials or external access;
@@ -467,6 +474,12 @@ judgment-heavy PRs.
 Final reports for PR work must state the risk classification and auto-merge
 status, and must clearly distinguish "direct merge not performed" from
 "GitHub auto-merge enabled" when relevant.
+
+On resumed continuations, an existing PR whose merge state does not prove it is
+merged is a pause gate. Do not repeatedly re-evaluate auto-merge eligibility,
+branch protection, checks, or reviews for that PR; report that the PR is not
+merged and stop. Auto-merge eligibility checks belong to the PR creation turn or
+to an explicit user request to inspect or update that PR.
 
 ## Risk Classification
 
@@ -533,6 +546,8 @@ Start from repo evidence, not chat memory. Use the context ladder, cap unknown o
 - Pasting full generated reports into final answers.
 - Creating durable helper files when the repo scope only allowed temporary or read-only work.
 - Continuing past an unverified PR gate or dirty worktree.
+- Repeatedly checking, polling, or reclassifying the same not-merged PR gate
+  instead of pausing after one current-state status check.
 - Treating sensitive-keyword scanner hits on guardrail text as secret exposure without checking whether actual values were present.
 
 ## Tools and deterministic operations
@@ -560,7 +575,8 @@ Before finishing a governed long-session task, check:
 - long files were targeted, sampled, or explicitly justified before full read;
 - raw data was summarized through a needle map before analysis;
 - handoff was updated or proposed if the session became long;
-- PR gate was checked when tooling and authorization allowed it;
+- PR gate was checked once when tooling and authorization allowed it, and any
+  not-verified-merged PR gate paused without repeated polling;
 - no PR was merged;
 - final output is concise and reports checks, changed files, blockers, assumptions, and next action.
 
