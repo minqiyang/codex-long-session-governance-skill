@@ -8,6 +8,7 @@ This is a single-skill repo for the `codex-long-session-governance` Codex Skill.
 
 - This repo installs one Codex Skill: `codex-long-session-governance`.
 - It helps Codex avoid oversized `/goal` prompts, broad log reads, stale memory, and token waste.
+- It adds conservative repo workflow gates, including GitHub auto-merge rules for low-risk PRs.
 - It does not replace project-specific `AGENTS.md` files or task-specific Skills.
 - It is most useful for large repos, long sessions, generated outputs, and staged PR workflows.
 - It is not needed for tiny one-off edits.
@@ -16,6 +17,18 @@ This is a single-skill repo for the `codex-long-session-governance` Codex Skill.
 
 Long Codex sessions can become expensive and unreliable when prompts, logs, reports, raw data, and tool outputs grow too large. Common failure modes include stale memory, broad rereads, context truncation, hallucinated repo state, and oversized `/goal` prompts that try to carry an entire stage specification.
 
+## What This Skill Governs
+
+Use this Skill when Codex needs discipline around:
+
+- long-running Codex sessions;
+- context-budget governance and command output caps;
+- prompt compression and oversized `/goal` handling;
+- splitting durable instructions across handoff, stage-plan, controller, and Skill files;
+- do-not-reread rules for repeated sessions;
+- truncation recovery when output or context is incomplete;
+- repo workflow gates before implementation, PR creation, or push;
+- conservative GitHub auto-merge decisions for clearly low-risk PRs.
 
 ## Use for:
 
@@ -95,6 +108,20 @@ Keep scope to the stage plan, preserve stop gates, run listed validation, update
 
 The detailed specification belongs in `docs/STAGE_PLAN.md` or an equivalent stage plan. Current state belongs in `docs/current_handoff.md` or `HANDOFF.md`. Stop gates and context budget rules belong in a controller doc. Permanent rules belong in `AGENTS.md`.
 
+## Conservative GitHub Auto-Merge Governance
+
+This Skill distinguishes direct merges from GitHub auto-merge:
+
+- Codex must not direct-merge to `main` or `master`.
+- Codex must not bypass branch protection.
+- Codex must not use admin override, including `gh pr merge --admin`.
+- Codex may only enable GitHub auto-merge for clearly low-risk small PRs.
+- Low-risk PRs must be narrow, in scope, locally validated, and protected by required checks or reviews.
+- If checks, reviews, branch protection, or merge queue requirements are unclear, Codex must stop for human review.
+- If CI fails, merge conflicts exist, risk is medium or high, scope is unclear, or human judgment is needed, Codex must stop for human review.
+
+Auto-merge is still GitHub performing the final merge after configured requirements pass. It is not permission to skip review, bypass protections, or push directly to a protected branch.
+
 ## File Layout
 
 ```text
@@ -120,6 +147,12 @@ The detailed specification belongs in `docs/STAGE_PLAN.md` or an equivalent stag
 - `assets/`: reusable prompt template assets.
 - `references/`: audit checklist and supporting reference material.
 - `examples/`: generic usage examples for readers; not installed by default.
+
+For details, read:
+
+- [`SKILL.md`](SKILL.md) for operational rules.
+- [`references/context-budget-audit.md`](references/context-budget-audit.md) for audit guidance.
+- [`assets/long-session-goal-template.md`](assets/long-session-goal-template.md) for a reusable `/goal` template.
 
 ## Safety Model
 
