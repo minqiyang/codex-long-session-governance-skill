@@ -30,6 +30,7 @@ Validation:
 <commands>
 
 Stop gates:
+- Git/PR: follow repo controller auto-merge policy; low-risk small PRs may enable GitHub auto-merge only when protections are verifiable and no bypass is used.
 - dirty worktree or unrelated changes;
 - open PR gate not verified merged;
 - failing checks not safely fixable within scope;

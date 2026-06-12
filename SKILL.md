@@ -405,6 +405,8 @@ Final reports should include only relevant items from this list:
 - PR link if available;
 - changed files;
 - checks run;
+- risk classification;
+- auto-merge status if a PR exists;
 - issues by severity;
 - assumptions;
 - next recommended stage;
@@ -442,6 +444,29 @@ Stop conditions:
 - after opening a PR.
 
 Never merge PRs.
+
+## Conservative GitHub Auto-Merge Policy
+
+Direct merge and GitHub auto-merge are different. Codex must never direct-merge
+to `main`, bypass branch protection, or use `gh pr merge --admin`.
+
+Codex may enable GitHub auto-merge only for clearly low-risk small PRs when
+repository protections are present and verifiable. Auto-merge means GitHub
+performs the final merge only after required reviews, required checks, branch
+protection, and merge queue requirements are satisfied.
+
+Do not enable auto-merge if required checks, reviews, branch protection, or
+merge queue requirements cannot be verified. Do not enable auto-merge if the
+repository has no required CI or check protection.
+
+Stop for human review on medium-risk, high-risk, compliance-ambiguous,
+destructive, security-sensitive, dependency-changing, credential-touching,
+generated-output-heavy, public-API-changing, unclear, unprotected, or
+judgment-heavy PRs.
+
+Final reports for PR work must state the risk classification and auto-merge
+status, and must clearly distinguish "direct merge not performed" from
+"GitHub auto-merge enabled" when relevant.
 
 ## Risk Classification
 

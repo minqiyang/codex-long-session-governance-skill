@@ -24,5 +24,10 @@ Use this lightweight checklist to audit a long-session governance run or the Ski
 - Stop gates are preserved after compression.
 - Validation commands are preserved after compression.
 - Prompt compression removes explanation and repetition, not requirements.
+- Does the policy distinguish direct merge from GitHub auto-merge?
+- Does it forbid `--admin`?
+- Does it require verifiable branch protection/checks/reviews?
+- Does it stop when risk is medium/high/unclear?
+- Does final report include risk classification and auto-merge status?
 - No secrets, `.env` content, credentials, tokens, SSH keys, API keys, or `config.toml` content are read or modified.
 - No permanent helper files are created unless the repo scope explicitly allows them.
