@@ -80,6 +80,12 @@ Use these invariants:
 - If a PR gate is not verified merged, report it once and pause; do not
   repeatedly re-check, re-poll, or continue startup validation in the same
   continuation unless the user explicitly asks for PR inspection.
+- If an automatic or goal-driven continuation resumes immediately after the
+  same not-verified-merged PR gate was already reported, and the user has not
+  stated that the PR merged or explicitly asked for inspection, do not run
+  `git fetch`, `gh pr list`, checks, reviews, or protection queries again.
+  Report the cached gate and, when goal status tooling is available, mark the
+  active goal blocked instead of consuming another gate-check turn.
 - Never merge PRs.
 - Do not rely on truncated output.
 - Keep `/goal` short; place durable instructions in the right source of truth.
@@ -481,6 +487,12 @@ branch protection, checks, or reviews for that PR; report that the PR is not
 merged and stop. Auto-merge eligibility checks belong to the PR creation turn or
 to an explicit user request to inspect or update that PR.
 
+If an automatic continuation resumes after that same pause and no new user
+message says the PR merged, Codex should not perform another network status
+check just to rediscover the same gate. It should report the cached gate state
+from the immediately prior turn and mark the active goal blocked when goal
+status tooling is available.
+
 ## Risk Classification
 
 High risk:
@@ -548,6 +560,9 @@ Start from repo evidence, not chat memory. Use the context ladder, cap unknown o
 - Continuing past an unverified PR gate or dirty worktree.
 - Repeatedly checking, polling, or reclassifying the same not-merged PR gate
   instead of pausing after one current-state status check.
+- Treating automatic goal continuations as a reason to rerun the same open-PR
+  gate check when the prior turn already reported that exact gate and no user
+  message supplied a merge-state change.
 - Treating sensitive-keyword scanner hits on guardrail text as secret exposure without checking whether actual values were present.
 
 ## Tools and deterministic operations

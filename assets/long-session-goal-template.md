@@ -31,7 +31,7 @@ Validation:
 
 Stop gates:
 - Git/PR: follow repo controller auto-merge policy; low-risk small PRs may enable GitHub auto-merge only when protections are verifiable and no bypass is used.
-- PR gate: if an existing PR is not verified merged, report once and pause; do not repeatedly re-check, re-poll, or run baseline validation.
+- PR gate: if an existing PR is not verified merged, report once and pause; on automatic resume without a user-stated merge, reuse the cached gate or mark blocked instead of rechecking.
 - dirty worktree or unrelated changes;
 - failing checks not safely fixable within scope;
 - credentials, secrets, or config access required;

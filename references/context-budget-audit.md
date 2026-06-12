@@ -13,6 +13,9 @@ Use this lightweight checklist to audit a long-session governance run or the Ski
 - PR gate rule exists.
 - Does a not-verified-merged PR gate pause after one current-state check rather
   than repeated polling or reclassification?
+- If an automatic continuation resumes after the same PR gate and no user says
+  the PR merged, does Codex avoid another `fetch`/`gh pr list` and use the
+  cached gate or blocked-goal path instead?
 - Repo workflow governance stop conditions exist.
 - Truncation recovery exists.
 - Final output rules are concise.
