@@ -11,6 +11,7 @@ Requirements:
 - Read only Level 1 source-of-truth docs before targeted code reads.
 - Byte-cap unknown output.
 - Do not read secrets, config files, raw data, or full long logs.
-- Stop and report if there is an open PR gate, dirty worktree, truncated output, credential need, destructive operation, or high-risk ambiguity.
+- Stop and report once if there is an open or otherwise not-verified-merged PR gate; do not repeatedly re-check or poll it.
+- Also stop for dirty worktree, truncated output, credential need, destructive operation, or high-risk ambiguity.
 - Final report should include changed files, checks run, blockers, assumptions, and next action.
 ```

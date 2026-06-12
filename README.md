@@ -9,6 +9,7 @@ This is a single-skill repo for the `codex-long-session-governance` Codex Skill.
 - This repo installs one Codex Skill: `codex-long-session-governance`.
 - It helps Codex avoid oversized `/goal` prompts, broad log reads, stale memory, and token waste.
 - It adds conservative repo workflow gates, including GitHub auto-merge rules for low-risk PRs.
+- It pauses at not-verified-merged PR gates after one status check instead of repeatedly polling.
 - It does not replace project-specific `AGENTS.md` files or task-specific Skills.
 - It is most useful for large repos, long sessions, generated outputs, and staged PR workflows.
 - It is not needed for tiny one-off edits.
@@ -28,6 +29,7 @@ Use this Skill when Codex needs discipline around:
 - do-not-reread rules for repeated sessions;
 - truncation recovery when output or context is incomplete;
 - repo workflow gates before implementation, PR creation, or push;
+- one-check pause behavior for not-verified-merged PR gates;
 - conservative GitHub auto-merge decisions for clearly low-risk PRs.
 
 ## Use for:
@@ -119,6 +121,7 @@ This Skill distinguishes direct merges from GitHub auto-merge:
 - Low-risk PRs must be narrow, in scope, locally validated, and protected by required checks or reviews.
 - If checks, reviews, branch protection, or merge queue requirements are unclear, Codex must stop for human review.
 - If CI fails, merge conflicts exist, risk is medium or high, scope is unclear, or human judgment is needed, Codex must stop for human review.
+- On resumed continuations, if an existing PR is not verified merged, Codex should report the gate once and pause instead of repeatedly checking reviews, checks, protection, or auto-merge eligibility.
 
 Auto-merge is still GitHub performing the final merge after configured requirements pass. It is not permission to skip review, bypass protections, or push directly to a protected branch.
 
