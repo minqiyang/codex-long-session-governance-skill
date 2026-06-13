@@ -77,15 +77,15 @@ Use these invariants:
 - Summarize; do not paste.
 - One PR-sized stage at a time.
 - Stop at merge gates.
-- If a PR gate is not verified merged, report it once and pause; do not
-  repeatedly re-check, re-poll, or continue startup validation in the same
-  continuation unless the user explicitly asks for PR inspection.
-- If an automatic or goal-driven continuation resumes immediately after the
-  same not-verified-merged PR gate was already reported, and the user has not
-  stated that the PR merged or explicitly asked for inspection, do not run
-  `git fetch`, `gh pr list`, checks, reviews, or protection queries again.
-  Report the cached gate and, when goal status tooling is available, mark the
-  active goal blocked instead of consuming another gate-check turn.
+- If a PR gate is not verified merged, report it once and pause immediately;
+  do not repeatedly re-check, re-poll, continue startup validation,
+  reclassify auto-merge eligibility, or mark the goal blocked because the same
+  external PR gate is still pending.
+- If an automatic or goal-driven continuation resumes after the same
+  not-verified-merged PR gate and the user has not stated that the PR merged or
+  explicitly asked for inspection, do not run `git fetch`, `gh pr list`,
+  checks, reviews, or protection queries. Do not repeat the gate report except
+  for the shortest possible pause note if a response is required.
 - Never merge PRs.
 - Do not rely on truncated output.
 - Keep `/goal` short; place durable instructions in the right source of truth.
@@ -483,15 +483,17 @@ status, and must clearly distinguish "direct merge not performed" from
 
 On resumed continuations, an existing PR whose merge state does not prove it is
 merged is a pause gate. Do not repeatedly re-evaluate auto-merge eligibility,
-branch protection, checks, or reviews for that PR; report that the PR is not
-merged and stop. Auto-merge eligibility checks belong to the PR creation turn or
-to an explicit user request to inspect or update that PR.
+branch protection, checks, or reviews for that PR. Auto-merge eligibility checks
+belong to the PR creation turn or to an explicit user request to inspect or
+update that PR.
 
 If an automatic continuation resumes after that same pause and no new user
 message says the PR merged, Codex should not perform another network status
-check just to rediscover the same gate. It should report the cached gate state
-from the immediately prior turn and mark the active goal blocked when goal
-status tooling is available.
+check just to rediscover the same gate, should not repeat the full gate report,
+and should not mark the active goal blocked merely because the external PR gate
+is still pending. Pause immediately; if the interface requires a response, use
+only a terse note that no checks were run because the previously reported PR
+gate is still awaiting external merge.
 
 ## Risk Classification
 
@@ -561,8 +563,9 @@ Start from repo evidence, not chat memory. Use the context ladder, cap unknown o
 - Repeatedly checking, polling, or reclassifying the same not-merged PR gate
   instead of pausing after one current-state status check.
 - Treating automatic goal continuations as a reason to rerun the same open-PR
-  gate check when the prior turn already reported that exact gate and no user
-  message supplied a merge-state change.
+  gate check, repeat the same gate report, or mark the goal blocked when the
+  prior turn already reported that exact gate and no user message supplied a
+  merge-state change.
 - Treating sensitive-keyword scanner hits on guardrail text as secret exposure without checking whether actual values were present.
 
 ## Tools and deterministic operations

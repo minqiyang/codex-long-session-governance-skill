@@ -121,7 +121,7 @@ This Skill distinguishes direct merges from GitHub auto-merge:
 - Low-risk PRs must be narrow, in scope, locally validated, and protected by required checks or reviews.
 - If checks, reviews, branch protection, or merge queue requirements are unclear, Codex must stop for human review.
 - If CI fails, merge conflicts exist, risk is medium or high, scope is unclear, or human judgment is needed, Codex must stop for human review.
-- On resumed continuations, if an existing PR is not verified merged, Codex should report the gate once and pause instead of repeatedly checking reviews, checks, protection, or auto-merge eligibility.
+- On resumed continuations, if an existing PR is not verified merged, Codex should report the gate once and pause instead of repeatedly checking reviews, checks, protection, or auto-merge eligibility. Automatic resumes without a user-stated merge or inspection request should not repeat the full gate report or mark the goal blocked merely because the external PR gate is still pending.
 
 Auto-merge is still GitHub performing the final merge after configured requirements pass. It is not permission to skip review, bypass protections, or push directly to a protected branch.
 
