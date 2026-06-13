@@ -9,7 +9,7 @@ This is a single-skill repo for the `codex-long-session-governance` Codex Skill.
 - This repo installs one Codex Skill: `codex-long-session-governance`.
 - It helps Codex avoid oversized `/goal` prompts, broad log reads, stale memory, and token waste.
 - It adds conservative repo workflow gates, including GitHub auto-merge rules for low-risk PRs.
-- It pauses at not-verified-merged PR gates after one status check instead of repeatedly polling.
+- It treats not-verified-merged PR gates as paused external wait states after one status check instead of repeatedly polling or printing pause notes.
 - It does not replace project-specific `AGENTS.md` files or task-specific Skills.
 - It is most useful for large repos, long sessions, generated outputs, and staged PR workflows.
 - It is not needed for tiny one-off edits.
@@ -121,7 +121,8 @@ This Skill distinguishes direct merges from GitHub auto-merge:
 - Low-risk PRs must be narrow, in scope, locally validated, and protected by required checks or reviews.
 - If checks, reviews, branch protection, or merge queue requirements are unclear, Codex must stop for human review.
 - If CI fails, merge conflicts exist, risk is medium or high, scope is unclear, or human judgment is needed, Codex must stop for human review.
-- On resumed continuations, if an existing PR is not verified merged, Codex should report the gate once and pause instead of repeatedly checking reviews, checks, protection, or auto-merge eligibility. Automatic resumes without a user-stated merge or inspection request should not repeat the full gate report or mark the goal blocked merely because the external PR gate is still pending.
+- Paused External PR Gate State: An open or not-verified-merged PR gate is an external wait state. After reporting it once, Codex must pause the active goal and wait for explicit user resume. Automatic continuation without a user-stated merge/resume/inspect instruction must not query GitHub again, must not repeat gate reports, must not mark the goal complete, and must not mark the goal blocked merely because the same external PR is still pending.
+- If the interface forces a response during that paused state, Codex should return only: `Waiting for PR #X to merge; no checks run.`
 
 Auto-merge is still GitHub performing the final merge after configured requirements pass. It is not permission to skip review, bypass protections, or push directly to a protected branch.
 
