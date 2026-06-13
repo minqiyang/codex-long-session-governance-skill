@@ -11,12 +11,16 @@ Use this lightweight checklist to audit a long-session governance run or the Ski
 - Living handoff rule exists.
 - Periodic compaction rule exists.
 - PR gate rule exists.
-- Does a not-verified-merged PR gate pause after one current-state check rather
-  than repeated polling or reclassification?
+- Does a not-verified-merged PR gate enter a paused external wait state after
+  one current-state check rather than repeated polling or reclassification?
+- Does the policy explicitly avoid marking the goal complete or blocked merely
+  because the same external PR gate is still pending?
 - If an automatic continuation resumes after the same PR gate and no user says
-  the PR merged or asks for inspection, does Codex avoid another
-  `fetch`/`gh pr list`, avoid repeating the full gate report, and avoid marking
-  the goal blocked merely because the external PR gate is still pending?
+  the PR merged, asks to resume, or asks for inspection, does Codex avoid
+  `fetch`/`gh pr list`, avoid checks/reviews/protection queries, avoid repeating
+  the gate report, and avoid repeatedly printing pause notes?
+- If the interface forces a response in that paused state, is the response only
+  `Waiting for PR #X to merge; no checks run.`?
 - Repo workflow governance stop conditions exist.
 - Truncation recovery exists.
 - Final output rules are concise.

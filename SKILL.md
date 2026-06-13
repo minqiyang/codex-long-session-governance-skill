@@ -77,15 +77,14 @@ Use these invariants:
 - Summarize; do not paste.
 - One PR-sized stage at a time.
 - Stop at merge gates.
-- If a PR gate is not verified merged, report it once and pause immediately;
-  do not repeatedly re-check, re-poll, continue startup validation,
-  reclassify auto-merge eligibility, or mark the goal blocked because the same
-  external PR gate is still pending.
-- If an automatic or goal-driven continuation resumes after the same
-  not-verified-merged PR gate and the user has not stated that the PR merged or
-  explicitly asked for inspection, do not run `git fetch`, `gh pr list`,
-  checks, reviews, or protection queries. Do not repeat the gate report except
-  for the shortest possible pause note if a response is required.
+- Paused External PR Gate State: An open or not-verified-merged PR gate is an
+  external wait state. After reporting it once, Codex must pause the active
+  goal and wait for explicit user resume. Automatic continuation without a
+  user-stated merge/resume/inspect instruction must not query GitHub again,
+  must not repeat gate reports, must not mark the goal complete, and must not
+  mark the goal blocked merely because the same external PR is still pending.
+- If the interface forces a response during the paused external PR gate state,
+  return only: `Waiting for PR #X to merge; no checks run.`
 - Never merge PRs.
 - Do not rely on truncated output.
 - Keep `/goal` short; place durable instructions in the right source of truth.
@@ -429,9 +428,10 @@ Before implementation:
 - check dirty worktree;
 - check remotes;
 - check the open PR gate once if tooling is available;
-- if a PR gate is not verified merged, stop after a concise gate report and do
-  not re-run checks, protection queries, review queries, or baseline validation
-  in that continuation;
+- if a PR gate is not verified merged, report one concise gate summary, enter
+  the paused external PR gate state, and do not run checks, protection queries,
+  review queries, baseline validation, or another stage until explicit user
+  resume;
 - read Level 1 context only;
 - choose one small PR-sized stage;
 - state assumptions only if needed.
@@ -481,19 +481,18 @@ Final reports for PR work must state the risk classification and auto-merge
 status, and must clearly distinguish "direct merge not performed" from
 "GitHub auto-merge enabled" when relevant.
 
-On resumed continuations, an existing PR whose merge state does not prove it is
-merged is a pause gate. Do not repeatedly re-evaluate auto-merge eligibility,
-branch protection, checks, or reviews for that PR. Auto-merge eligibility checks
-belong to the PR creation turn or to an explicit user request to inspect or
-update that PR.
+Paused External PR Gate State: An open or not-verified-merged PR gate is an
+external wait state. After reporting it once, Codex must pause the active goal
+and wait for explicit user resume. Automatic continuation without a user-stated
+merge/resume/inspect instruction must not query GitHub again, must not repeat
+gate reports, must not mark the goal complete, and must not mark the goal
+blocked merely because the same external PR is still pending.
 
-If an automatic continuation resumes after that same pause and no new user
-message says the PR merged, Codex should not perform another network status
-check just to rediscover the same gate, should not repeat the full gate report,
-and should not mark the active goal blocked merely because the external PR gate
-is still pending. Pause immediately; if the interface requires a response, use
-only a terse note that no checks were run because the previously reported PR
-gate is still awaiting external merge.
+On resumed continuations, do not re-evaluate auto-merge eligibility, branch
+protection, checks, or reviews for the same external PR gate unless the user
+states that the PR merged, asks to resume after merge, or explicitly asks to
+inspect that PR. If the interface forces a response during the paused state,
+return only: `Waiting for PR #X to merge; no checks run.`
 
 ## Risk Classification
 
@@ -561,11 +560,13 @@ Start from repo evidence, not chat memory. Use the context ladder, cap unknown o
 - Creating durable helper files when the repo scope only allowed temporary or read-only work.
 - Continuing past an unverified PR gate or dirty worktree.
 - Repeatedly checking, polling, or reclassifying the same not-merged PR gate
-  instead of pausing after one current-state status check.
+  instead of entering the paused external PR gate state after one current-state
+  status check.
 - Treating automatic goal continuations as a reason to rerun the same open-PR
-  gate check, repeat the same gate report, or mark the goal blocked when the
-  prior turn already reported that exact gate and no user message supplied a
-  merge-state change.
+  gate check, repeat the same gate report, print repeated pause notes, mark the
+  goal complete, or mark the goal blocked when the prior turn already reported
+  that exact gate and no user message supplied a merge/resume/inspect
+  instruction.
 - Treating sensitive-keyword scanner hits on guardrail text as secret exposure without checking whether actual values were present.
 
 ## Tools and deterministic operations
@@ -594,7 +595,8 @@ Before finishing a governed long-session task, check:
 - raw data was summarized through a needle map before analysis;
 - handoff was updated or proposed if the session became long;
 - PR gate was checked once when tooling and authorization allowed it, and any
-  not-verified-merged PR gate paused without repeated polling;
+  not-verified-merged PR gate entered the paused external PR gate state without
+  repeated polling, repeated reports, goal completion, or blocked status;
 - no PR was merged;
 - final output is concise and reports checks, changed files, blockers, assumptions, and next action.
 
